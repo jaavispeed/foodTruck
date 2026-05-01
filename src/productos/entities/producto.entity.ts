@@ -1,18 +1,33 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity()
 export class Producto {
   @PrimaryGeneratedColumn('increment')
   id!: number;
 
-  @Column('varchar', {
-    length: 200,
+  @Column('text', {
     unique: true,
   })
   nombre!: string;
 
-  @Column('numeric', {
+  @Column('float', {
     default: 0,
   })
   precio!: number;
+
+  @CreateDateColumn({
+    type: 'timestamp',
+    precision: 0,
+  })
+  fechaCreacion!: Date;
+
+  @Column('text', {
+    default: 'VIGENTE',
+  })
+  estado!: string;
 }
