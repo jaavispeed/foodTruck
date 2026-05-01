@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { PaginationDto } from './common/dtos/pagination.dto';
+import { PaginationDto } from '../common/dtos/pagination.dto';
 import { CreateProductoDto } from './dto/create-producto.dto';
 import { UpdateProductoDto } from './dto/update-producto.dto';
 import { Producto } from './entities/producto.entity';
@@ -48,7 +48,20 @@ export class ProductosService {
   }
 
   async update(id: number, updateProductoDto: UpdateProductoDto) {
-    return `This action updates a #${id} producto`;
+    const product = await this.productoRepository.preload({
+      id: id,
+      ...updateProductoDto,
+    });
+
+    if (!product) {
+      throw new NotFoundException(`Producto con id ${id} no encontrado`);
+    }
+
+    try {
+      return await this.productoRepository.save(product);
+    } catch (error) {
+      this.handleDBExceptions(error);
+    }
   }
 
   async softDelete(id: number) {
