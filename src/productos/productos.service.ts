@@ -31,10 +31,10 @@ export class ProductosService {
   }
 
   async getAll(paginationDto: PaginationDto) {
-    const { limit = 10, page = 0 } = paginationDto;
+    const { limit = 10, offset = 0 } = paginationDto;
     return this.productoRepository.find({
       take: limit,
-      skip: page,
+      skip: offset,
       where: { estado: 'VIGENTE' },
     });
   }
