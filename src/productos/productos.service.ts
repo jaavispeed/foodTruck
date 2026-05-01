@@ -8,6 +8,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { PaginationDto } from '../common/dtos/pagination.dto';
+import { Estado } from '../common/enum/estados.enum';
 import { CreateProductoDto } from './dto/create-producto.dto';
 import { UpdateProductoDto } from './dto/update-producto.dto';
 import { Producto } from './entities/producto.entity';
@@ -35,7 +36,7 @@ export class ProductosService {
     return this.productoRepository.find({
       take: limit,
       skip: offset,
-      where: { estado: 'VIGENTE' },
+      where: { estado: Estado.VIGENTE },
     });
   }
 
@@ -68,7 +69,7 @@ export class ProductosService {
     const producto = await this.getByIdProducto(id);
 
     try {
-      await this.productoRepository.update(id, { estado: 'ELIMINADO' });
+      await this.productoRepository.update(id, { estado: Estado.ELIMINADO });
       return { message: `Producto con id ${id} eliminado correctamente` };
     } catch (error) {
       this.handleDBExceptions(error);

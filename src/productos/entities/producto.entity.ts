@@ -4,6 +4,7 @@ import {
   Entity,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { Estado } from '../../common/enum/estados.enum';
 
 @Entity()
 export class Producto {
@@ -26,8 +27,10 @@ export class Producto {
   })
   fechaCreacion!: Date;
 
-  @Column('text', {
-    default: 'VIGENTE',
+  @Column({
+    type: 'enum',
+    enum: Estado,
+    default: Estado.VIGENTE,
   })
-  estado!: string;
+  estado!: Estado;
 }

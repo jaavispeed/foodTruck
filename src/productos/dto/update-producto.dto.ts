@@ -1,9 +1,10 @@
 import { PartialType } from '@nestjs/mapped-types';
-import { IsOptional, IsString } from 'class-validator';
+import { IsEnum, IsOptional } from 'class-validator';
+import { Estado } from '../../common/enum/estados.enum';
 import { CreateProductoDto } from './create-producto.dto';
 
 export class UpdateProductoDto extends PartialType(CreateProductoDto) {
-  @IsString()
+  @IsEnum(Estado)
   @IsOptional()
-  estado?: string;
+  estado?: Estado;
 }
