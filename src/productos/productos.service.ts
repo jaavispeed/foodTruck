@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { PaginationDto } from './common/dtos/pagination.dto';
 import { CreateProductoDto } from './dto/create-producto.dto';
 import { UpdateProductoDto } from './dto/update-producto.dto';
 import { Producto } from './entities/producto.entity';
@@ -29,8 +30,13 @@ export class ProductosService {
     }
   }
 
-  async getAll() {
-    return this.productoRepository.find({});
+  async getAll(paginationDto: PaginationDto) {
+    const { limit = 10, page = 0 } = paginationDto;
+    return this.productoRepository.find({
+      take: limit,
+      skip: page,
+      where: { estado: 'VIGENTE' },
+    });
   }
 
   async getByIdProducto(id: number) {
