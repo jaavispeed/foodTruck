@@ -4,9 +4,11 @@ import {
   InternalServerErrorException,
   UnauthorizedException,
 } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { Repository } from 'typeorm';
+import { JwtPayload } from '../interfaces/jwt-payload.interfaces';
 import { LoginUserDto } from './dto/login/login-user.dto';
 import { RegisterUserDto } from './dto/register/register-user.dto';
 import { Usuario } from './entities/usuario.entity';
@@ -16,6 +18,7 @@ export class AuthService {
   constructor(
     @InjectRepository(Usuario)
     private readonly userRepository: Repository<Usuario>,
+    private readonly jwtService: JwtService,
   ) {}
 
   async registerUser(registerUserDto: RegisterUserDto) {
@@ -29,7 +32,10 @@ export class AuthService {
 
       const savedUser = await this.userRepository.save(user);
       delete (savedUser as any).password;
-      return user;
+      return {
+        ...user,
+        token: this.getJwtToken({ email: user.email }),
+      };
     } catch (error) {
       this.handleError(error);
     }
@@ -49,6 +55,15 @@ export class AuthService {
     if (!bcrypt.compareSync(password, user.password)) {
       throw new UnauthorizedException('Credenciales incorrectas');
     }
+    return {
+      ...user,
+      token: this.getJwtToken({ email: user.email }),
+    };
+  }
+
+  private getJwtToken(payload: JwtPayload) {
+    const token = this.jwtService.sign(payload);
+    return token;
   }
 
   private handleError(error: any) {
