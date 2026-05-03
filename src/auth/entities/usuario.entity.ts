@@ -3,9 +3,11 @@ import {
   BeforeUpdate,
   Column,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Estado } from '../../common/enum/estados.enum';
+import { Producto } from '../../productos/entities/producto.entity';
 
 @Entity()
 export class Usuario {
@@ -40,6 +42,9 @@ export class Usuario {
     default: ['USER'],
   })
   rol!: string[];
+
+  @OneToMany(() => Producto, (producto) => producto.usuario)
+  producto!: Producto;
 
   @BeforeInsert()
   checkFieldsBeforeInsert() {

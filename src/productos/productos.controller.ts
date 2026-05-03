@@ -9,6 +9,8 @@ import {
   Query,
 } from '@nestjs/common';
 import { Auth } from '../auth/decorators/auth.decorator';
+import { GetUser } from '../auth/decorators/get-user.decorator';
+import { Usuario } from '../auth/entities/usuario.entity';
 import { PaginationDto } from '../common/dtos/pagination.dto';
 import { CreateProductoDto } from './dto/create-producto.dto';
 import { UpdateProductoDto } from './dto/update-producto.dto';
@@ -20,8 +22,11 @@ export class ProductosController {
   constructor(private readonly productosService: ProductosService) {}
 
   @Post()
-  create(@Body() createProductoDto: CreateProductoDto) {
-    return this.productosService.create(createProductoDto);
+  create(
+    @Body() createProductoDto: CreateProductoDto,
+    @GetUser() usuario: Usuario,
+  ) {
+    return this.productosService.create(createProductoDto, usuario);
   }
 
   @Get()

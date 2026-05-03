@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { Usuario } from '../auth/entities/usuario.entity';
 import { PaginationDto } from '../common/dtos/pagination.dto';
 import { Estado } from '../common/enum/estados.enum';
 import { CreateProductoDto } from './dto/create-producto.dto';
@@ -22,9 +23,12 @@ export class ProductosService {
     private readonly productoRepository: Repository<Producto>,
   ) {}
 
-  async create(productoDto: CreateProductoDto) {
+  async create(productoDto: CreateProductoDto, usuario: Usuario) {
     try {
-      const producto = this.productoRepository.create(productoDto);
+      const producto = this.productoRepository.create({
+        ...productoDto,
+        usuario,
+      });
       return await this.productoRepository.save(producto);
     } catch (error) {
       this.handleDBExceptions(error);
