@@ -8,12 +8,14 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
+import { Auth } from '../auth/decorators/auth.decorator';
 import { PaginationDto } from '../common/dtos/pagination.dto';
 import { CreateProductoDto } from './dto/create-producto.dto';
 import { UpdateProductoDto } from './dto/update-producto.dto';
 import { ProductosService } from './productos.service';
 
 @Controller('productos')
+@Auth()
 export class ProductosController {
   constructor(private readonly productosService: ProductosService) {}
 
