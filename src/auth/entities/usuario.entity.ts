@@ -1,4 +1,10 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  BeforeInsert,
+  BeforeUpdate,
+  Column,
+  Entity,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Estado } from '../../common/enum/estados.enum';
 
 @Entity()
@@ -34,4 +40,14 @@ export class Usuario {
     default: ['USER'],
   })
   rol!: string[];
+
+  @BeforeInsert()
+  checkFieldsBeforeInsert() {
+    this.email.toLowerCase().trim();
+  }
+
+  @BeforeUpdate()
+  checkFieldsBeforeUpdate() {
+    this.email.toLowerCase().trim();
+  }
 }
