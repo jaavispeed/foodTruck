@@ -43,9 +43,18 @@ export class AuthService {
 
   async loginUser(loginUserDto: LoginUserDto) {
     const { email, password } = loginUserDto;
+
     const user = await this.userRepository.findOne({
       where: { email },
-      select: { email: true, password: true, id: true },
+      select: {
+        id: true,
+        email: true,
+        password: true,
+        nombre: true,
+        apellido: true,
+        rol: true,
+        estado: true,
+      },
     });
 
     if (!user) {
@@ -55,15 +64,25 @@ export class AuthService {
     if (!bcrypt.compareSync(password, user.password)) {
       throw new UnauthorizedException('Credenciales incorrectas');
     }
+
+    const { password: _, ...userSafe } = user;
+
     return {
-      ...user,
+      user: userSafe,
       token: this.getJwtToken({ id: user.id }),
     };
   }
 
   async checkAuthStatus(usuario: Usuario) {
     return {
-      ...usuario,
+      user: {
+        id: usuario.id,
+        email: usuario.email,
+        nombre: usuario.nombre,
+        apellido: usuario.apellido,
+        estado: usuario.estado,
+        role: usuario.rol,
+      },
       token: this.getJwtToken({ id: usuario.id }),
     };
   }
