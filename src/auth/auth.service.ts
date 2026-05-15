@@ -12,9 +12,12 @@ import { JwtPayload } from '../interfaces/jwt-payload.interfaces';
 import { LoginUserDto } from './dto/login/login-user.dto';
 import { RegisterUserDto } from './dto/register/register-user.dto';
 import { Usuario } from './entities/usuario.entity';
+import { handleDBExceptions } from '../common/helpers/handle-db-exceptions.helper';
+import { Logger } from '@nestjs/common';
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger('AuthService');
   constructor(
     @InjectRepository(Usuario)
     private readonly userRepository: Repository<Usuario>,
@@ -37,7 +40,7 @@ export class AuthService {
         token: this.getJwtToken({ id: user.id }),
       };
     } catch (error) {
-      this.handleError(error);
+      handleDBExceptions(error, this.logger);
     }
   }
 
@@ -90,15 +93,5 @@ export class AuthService {
   private getJwtToken(payload: JwtPayload) {
     const token = this.jwtService.sign(payload);
     return token;
-  }
-
-  private handleError(error: any) {
-    if (error.code === '23505') {
-      throw new BadRequestException(error.detail);
-    }
-    console.log(error);
-    throw new InternalServerErrorException(
-      'Porfavor, revise los logs del servidor',
-    );
   }
 }

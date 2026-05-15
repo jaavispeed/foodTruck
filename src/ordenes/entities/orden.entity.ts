@@ -3,27 +3,22 @@ import {
   CreateDateColumn,
   Entity,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Usuario } from '../../auth/entities/usuario.entity';
 import { Estado } from '../../common/enum/estados.enum';
 import { OrdenDetalle } from '../../orden-detalle/entities/orden-detalle.entity';
-import { OneToMany } from 'typeorm/browser';
 
 @Entity()
-export class Producto {
+export class Orden {
   @PrimaryGeneratedColumn('increment')
   id!: number;
-
-  @Column('text', {
-    unique: true,
-  })
-  nombre!: string;
 
   @Column('float', {
     default: 0,
   })
-  precio!: number;
+  total!: number;
 
   @CreateDateColumn({
     type: 'timestamp',
@@ -38,9 +33,11 @@ export class Producto {
   })
   estado!: Estado;
 
-  @ManyToOne(() => Usuario, (usuario) => usuario.producto, { eager: true })
+  @ManyToOne(() => Usuario, (usuario) => usuario.ordenes)
   usuario!: Usuario;
 
-  @OneToMany(() => OrdenDetalle, (ordenDetalle) => ordenDetalle.producto)
-  ordenDetalles!: OrdenDetalle[];
+  @OneToMany(() => OrdenDetalle, (ordenDetalle) => ordenDetalle.orden, {
+    cascade: true,
+  })
+  detalles!: OrdenDetalle[];
 }

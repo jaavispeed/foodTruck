@@ -13,6 +13,7 @@ import { Estado } from '../common/enum/estados.enum';
 import { CreateProductoDto } from './dto/create-producto.dto';
 import { UpdateProductoDto } from './dto/update-producto.dto';
 import { Producto } from './entities/producto.entity';
+import { handleDBExceptions } from '../common/helpers/handle-db-exceptions.helper';
 
 @Injectable()
 export class ProductosService {
@@ -31,7 +32,7 @@ export class ProductosService {
       });
       return await this.productoRepository.save(producto);
     } catch (error) {
-      this.handleDBExceptions(error);
+      handleDBExceptions(error, this.logger);
     }
   }
 
@@ -64,7 +65,7 @@ export class ProductosService {
     try {
       return await this.productoRepository.save(product);
     } catch (error) {
-      this.handleDBExceptions(error);
+      handleDBExceptions(error, this.logger);
     }
   }
 
@@ -73,17 +74,7 @@ export class ProductosService {
       await this.productoRepository.update(id, { estado: Estado.ELIMINADO });
       return { message: `Producto con id ${id} eliminado correctamente` };
     } catch (error) {
-      this.handleDBExceptions(error);
+      handleDBExceptions(error, this.logger);
     }
-  }
-
-  private handleDBExceptions(error: any) {
-    if (error.code === '23505') {
-      throw new BadRequestException(error.detail);
-    }
-    this.logger.error(error);
-    throw new InternalServerErrorException(
-      'Error inesperado, revisar logs del servidor',
-    );
   }
 }

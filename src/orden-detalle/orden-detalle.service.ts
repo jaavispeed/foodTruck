@@ -1,26 +1,30 @@
 import { Injectable } from '@nestjs/common';
+import { EntityManager } from 'typeorm';
+import { OrdenCalculoService } from '../ordenes/orden-calculo.service';
+import { Producto } from '../productos/entities/producto.entity';
+import { OrdenDetalle } from './entities/orden-detalle.entity';
 import { CreateOrdenDetalleDto } from './dto/create-orden-detalle.dto';
-import { UpdateOrdenDetalleDto } from './dto/update-orden-detalle.dto';
 
 @Injectable()
 export class OrdenDetalleService {
-  create(createOrdenDetalleDto: CreateOrdenDetalleDto) {
-    return 'This action adds a new ordenDetalle';
-  }
+  constructor(private readonly ordenCalculoService: OrdenCalculoService) {}
 
-  findAll() {
-    return `This action returns all ordenDetalle`;
-  }
+  createDetalle(
+    detalleDto: CreateOrdenDetalleDto,
+    producto: Producto,
+    manager: EntityManager,
+  ): OrdenDetalle {
 
-  findOne(id: number) {
-    return `This action returns a #${id} ordenDetalle`;
-  }
+    const subtotal = this.ordenCalculoService.calcularSubtotal(
+      detalleDto.cantidad,
+      producto.precio,
+    );
 
-  update(id: number, updateOrdenDetalleDto: UpdateOrdenDetalleDto) {
-    return `This action updates a #${id} ordenDetalle`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} ordenDetalle`;
+    return manager.create(OrdenDetalle, {
+      cantidad: detalleDto.cantidad,
+      precioUnitario: producto.precio,
+      subtotal,
+      producto,
+    });
   }
 }

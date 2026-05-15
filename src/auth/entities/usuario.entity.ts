@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import { Estado } from '../../common/enum/estados.enum';
 import { Producto } from '../../productos/entities/producto.entity';
+import { Orden } from '../../ordenes/entities/orden.entity';
 
 @Entity()
 export class Usuario {
@@ -45,6 +46,9 @@ export class Usuario {
 
   @OneToMany(() => Producto, (producto) => producto.usuario)
   producto!: Producto;
+
+  @OneToMany(() => Orden, (orden) => orden.usuario)
+  ordenes!: Orden[];
 
   @BeforeInsert()
   checkFieldsBeforeInsert() {

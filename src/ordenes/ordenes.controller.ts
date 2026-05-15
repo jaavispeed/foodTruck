@@ -1,34 +1,44 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Query,
+} from '@nestjs/common';
+import { Auth } from '../auth/decorators/auth.decorator';
+import { GetUser } from '../auth/decorators/get-user.decorator';
+import { Usuario } from '../auth/entities/usuario.entity';
+import { PaginationDto } from '../common/dtos/pagination.dto';
+import { CreateOrdenDto } from './dto/create-orden.dto';
 import { OrdenesService } from './ordenes.service';
-import { CreateOrdeneDto } from './dto/create-ordene.dto';
-import { UpdateOrdeneDto } from './dto/update-ordene.dto';
 
 @Controller('ordenes')
+@Auth()
 export class OrdenesController {
   constructor(private readonly ordenesService: OrdenesService) {}
 
   @Post()
-  create(@Body() createOrdeneDto: CreateOrdeneDto) {
-    return this.ordenesService.create(createOrdeneDto);
+  create(
+    @Body() createOrdenDto: CreateOrdenDto,
+    @GetUser() usuario: Usuario,
+  ) {
+    return this.ordenesService.create(createOrdenDto, usuario);
   }
 
   @Get()
-  findAll() {
-    return this.ordenesService.findAll();
+  getAll(@Query() paginationDto: PaginationDto) {
+    return this.ordenesService.getAll(paginationDto);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.ordenesService.findOne(+id);
+  @Get(':idOrden')
+  getById(@Param('idOrden') idOrden: string) {
+    return this.ordenesService.getByIdOrden(+idOrden);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateOrdeneDto: UpdateOrdeneDto) {
-    return this.ordenesService.update(+id, updateOrdeneDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.ordenesService.remove(+id);
+  @Delete(':idOrden')
+  anular(@Param('idOrden') idOrden: string) {
+    return this.ordenesService.softDelete(+idOrden);
   }
 }
