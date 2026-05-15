@@ -40,7 +40,6 @@ export class ProductosService {
     return this.productoRepository.find({
       take: limit,
       skip: offset,
-      where: { estado: Estado.VIGENTE },
     });
   }
 
@@ -70,8 +69,6 @@ export class ProductosService {
   }
 
   async softDelete(id: number) {
-    const producto = await this.getByIdProducto(id);
-
     try {
       await this.productoRepository.update(id, { estado: Estado.ELIMINADO });
       return { message: `Producto con id ${id} eliminado correctamente` };
