@@ -3,12 +3,12 @@ import {
   CreateDateColumn,
   Entity,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Usuario } from '../../auth/entities/usuario.entity';
 import { Estado } from '../../common/enum/estados.enum';
 import { OrdenDetalle } from '../../orden-detalle/entities/orden-detalle.entity';
-import { OneToMany } from 'typeorm/browser';
 
 @Entity()
 export class Producto {
