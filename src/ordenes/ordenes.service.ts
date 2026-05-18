@@ -32,9 +32,9 @@ export class OrdenesService {
   ) {}
 
   async create(createOrdenDto: CreateOrdenDto, usuario: Usuario) {
-    const { detalles } = createOrdenDto;
+    const { orden: productosOrden } = createOrdenDto;
 
-    const productIds = detalles.map((d) => d.productoId);
+    const productIds = productosOrden.map((d) => d.productoId);
     const productos = await this.productoRepository.findBy({
       id: In(productIds),
     });
@@ -51,9 +51,9 @@ export class OrdenesService {
       const ordenDetalles: OrdenDetalle[] = [];
       const subtotales: number[] = [];
 
-      for (const detalle of detalles) {
+      for (const item of productosOrden) {
         const producto = productos.find(
-          (producto) => producto.id === detalle.productoId,
+          (producto) => producto.id === item.productoId,
         );
 
         if (!producto) {
@@ -61,7 +61,7 @@ export class OrdenesService {
         }
 
         const ordenDetalle = this.ordenDetalleService.createDetalle(
-          detalle,
+          item,
           producto,
           queryRunner.manager,
         );
