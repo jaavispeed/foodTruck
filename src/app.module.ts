@@ -6,6 +6,7 @@ import { CommonModule } from './common/common.module';
 import { ProductosModule } from './productos/productos.module';
 import { OrdenesModule } from './ordenes/ordenes.module';
 import { OrdenDetalleModule } from './orden-detalle/orden-detalle.module';
+import { DashboardModule } from './dashboard/dashboard.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { OrdenDetalleModule } from './orden-detalle/orden-detalle.module';
     AuthModule,
     OrdenesModule,
     OrdenDetalleModule,
+    DashboardModule,
   ],
   controllers: [],
   providers: [],
