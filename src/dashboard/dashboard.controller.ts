@@ -1,17 +1,24 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Query } from '@nestjs/common';
+import { Auth } from '../auth/decorators/auth.decorator';
 import { DashboardService } from './dashboard.service';
 
 @Controller('dashboard')
+@Auth()
 export class DashboardController {
   constructor(private readonly dashboardService: DashboardService) {}
 
-  @Get()
-  findAll() {
-    return this.dashboardService.findAll();
+  @Get('resumen')
+  getResumen(@Query('fecha') fecha?: string) {
+    return this.dashboardService.getResumen(fecha);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.dashboardService.findOne(+id);
+  @Get('productos-mas-vendidos')
+  getProductosMasVendidos(@Query('limit') limit?: string) {
+    return this.dashboardService.getProductosMasVendidos(limit ? +limit : 5);
+  }
+
+  @Get('ordenes-recientes')
+  getOrdenesRecientes() {
+    return this.dashboardService.getOrdenesRecientes();
   }
 }
