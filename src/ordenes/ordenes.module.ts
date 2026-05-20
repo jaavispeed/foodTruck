@@ -8,6 +8,7 @@ import { Orden } from './entities/orden.entity';
 import { OrdenCalculoService } from './orden-calculo.service';
 import { OrdenesController } from './ordenes.controller';
 import { OrdenesService } from './ordenes.service';
+import { CajaModule } from '../caja/caja.module';
 
 @Module({
   controllers: [OrdenesController],
@@ -16,6 +17,7 @@ import { OrdenesService } from './ordenes.service';
     TypeOrmModule.forFeature([Orden, OrdenDetalle, Producto]),
     AuthModule,
     OrdenDetalleModule,
+    CajaModule,
   ],
 })
 export class OrdenesModule {}

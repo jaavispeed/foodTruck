@@ -20,7 +20,9 @@ export class Producto {
   })
   nombre!: string;
 
-  @Column('float', {
+  @Column('decimal', {
+    precision: 10,
+    scale: 2,
     default: 0,
   })
   precio!: number;

@@ -7,6 +7,7 @@ import { ProductosModule } from './productos/productos.module';
 import { OrdenesModule } from './ordenes/ordenes.module';
 import { OrdenDetalleModule } from './orden-detalle/orden-detalle.module';
 import { DashboardModule } from './dashboard/dashboard.module';
+import { CajaModule } from './caja/caja.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { DashboardModule } from './dashboard/dashboard.module';
     OrdenesModule,
     OrdenDetalleModule,
     DashboardModule,
+    CajaModule,
   ],
   controllers: [],
   providers: [],

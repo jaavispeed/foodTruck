@@ -1,4 +1,5 @@
 export enum Estado {
   VIGENTE = 'VIGENTE',
+  PENDIENTE = 'PENDIENTE',
   ELIMINADO = 'ELIMINADO',
 }

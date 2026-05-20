@@ -2,10 +2,12 @@ import { Type } from 'class-transformer';
 import {
   ArrayMinSize,
   IsArray,
+  IsEnum,
   IsNumber,
   IsPositive,
   ValidateNested,
 } from 'class-validator';
+import { MetodoPago } from '../../common/enum/metodo-pago.enum';
 
 class OrdenProductoDto {
   @IsNumber()
@@ -23,4 +25,7 @@ export class CreateOrdenDto {
   @ValidateNested({ each: true })
   @Type(() => OrdenProductoDto)
   orden!: OrdenProductoDto[];
+
+  @IsEnum(MetodoPago)
+  metodoPago!: MetodoPago;
 }

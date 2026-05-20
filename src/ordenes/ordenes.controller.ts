@@ -39,6 +39,6 @@ export class OrdenesController {
 
   @Delete(':idOrden')
   anular(@Param('idOrden') idOrden: string) {
-    return this.ordenesService.softDelete(+idOrden);
+    return this.ordenesService.anular(+idOrden);
   }
 }

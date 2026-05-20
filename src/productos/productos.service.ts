@@ -28,6 +28,9 @@ export class ProductosService {
     try {
       const producto = this.productoRepository.create({
         ...productoDto,
+        precio: productoDto.precio
+          ? Math.round(productoDto.precio * 100) / 100
+          : 0,
         usuario,
       });
       return await this.productoRepository.save(producto);
@@ -49,6 +52,11 @@ export class ProductosService {
     if (!producto) {
       throw new NotFoundException(`Producto con id ${id} no encontrado`);
     }
+    if (producto.estado === Estado.ELIMINADO) {
+      throw new BadRequestException(
+        `El producto con id ${id} no está disponible`,
+      );
+    }
     return producto;
   }
 
@@ -56,6 +64,9 @@ export class ProductosService {
     const product = await this.productoRepository.preload({
       id: id,
       ...updateProductoDto,
+      precio: updateProductoDto.precio
+        ? Math.round(updateProductoDto.precio * 100) / 100
+        : undefined,
     });
 
     if (!product) {

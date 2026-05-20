@@ -9,6 +9,7 @@ import {
 import { Estado } from '../../common/enum/estados.enum';
 import { Producto } from '../../productos/entities/producto.entity';
 import { Orden } from '../../ordenes/entities/orden.entity';
+import { Caja } from '../../caja/entities/caja.entity';
 
 @Entity()
 export class Usuario {
@@ -49,6 +50,9 @@ export class Usuario {
 
   @OneToMany(() => Orden, (orden) => orden.usuario)
   ordenes!: Orden[];
+
+  @OneToMany(() => Caja, (caja) => caja.usuario)
+  cajas!: Caja[];
 
   @BeforeInsert()
   checkFieldsBeforeInsert() {

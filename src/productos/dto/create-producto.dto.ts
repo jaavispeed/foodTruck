@@ -1,4 +1,5 @@
 import {
+  IsNotEmpty,
   IsNumber,
   IsOptional,
   IsPositive,
@@ -8,10 +9,12 @@ import {
 
 export class CreateProductoDto {
   @IsString()
-  @MinLength(3)
+  @IsNotEmpty({ message: 'El nombre del producto es obligatorio' })
+  @MinLength(3, { message: 'El nombre debe tener al menos 3 caracteres' })
   nombre!: string;
+
   @IsNumber()
-  @IsPositive()
+  @IsPositive({ message: 'El precio debe ser mayor a 0' })
   @IsOptional()
   precio?: number;
 }
