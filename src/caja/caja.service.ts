@@ -1,10 +1,10 @@
-import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Caja } from './entities/caja.entity';
+import { Usuario } from '../auth/entities/usuario.entity';
 import { AbrirCajaDto } from './dto/abrir-caja.dto';
 import { CerrarCajaDto } from './dto/cerrar-caja.dto';
-import { Usuario } from '../auth/entities/usuario.entity';
+import { Caja } from './entities/caja.entity';
 
 @Injectable()
 export class CajaService {
@@ -30,17 +30,11 @@ export class CajaService {
     return this.cajaRepository.save(caja);
   }
 
-  async cerrarCaja(id: number, cerrarCajaDto: CerrarCajaDto) {
-    const caja = await this.cajaRepository.findOne({
-      where: { id },
-    });
+  async cerrarCaja(cerrarCajaDto: CerrarCajaDto) {
+    const caja = await this.getCajaAbierta();
 
     if (!caja) {
-      throw new NotFoundException(`Caja con ID ${id} no encontrada`);
-    }
-
-    if (!caja.estaAbierta) {
-      throw new BadRequestException(`La caja con ID ${id} ya está cerrada`);
+      throw new BadRequestException('No existe una caja abierta');
     }
 
     caja.estaAbierta = false;
@@ -52,7 +46,12 @@ export class CajaService {
 
   async getCajaAbierta() {
     return this.cajaRepository.findOne({
-      where: { estaAbierta: true },
+      where: {
+        estaAbierta: true,
+      },
+      order: {
+        fechaApertura: 'DESC',
+      },
     });
   }
 }

@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Param, Patch, Get } from '@nestjs/common';
+import { Body, Controller, Get, Patch, Post } from '@nestjs/common';
 import { Auth } from '../auth/decorators/auth.decorator';
 import { GetUser } from '../auth/decorators/get-user.decorator';
 import { Usuario } from '../auth/entities/usuario.entity';
@@ -12,19 +12,13 @@ export class CajaController {
   constructor(private readonly cajaService: CajaService) {}
 
   @Post('abrir')
-  abrirCaja(
-    @Body() abrirCajaDto: AbrirCajaDto,
-    @GetUser() usuario: Usuario,
-  ) {
+  abrirCaja(@Body() abrirCajaDto: AbrirCajaDto, @GetUser() usuario: Usuario) {
     return this.cajaService.abrirCaja(abrirCajaDto, usuario);
   }
 
-  @Patch('cerrar/:id')
-  cerrarCaja(
-    @Param('id') id: string,
-    @Body() cerrarCajaDto: CerrarCajaDto,
-  ) {
-    return this.cajaService.cerrarCaja(+id, cerrarCajaDto);
+  @Patch('cerrar')
+  cerrarCaja(@Body() cerrarCajaDto: CerrarCajaDto) {
+    return this.cajaService.cerrarCaja(cerrarCajaDto);
   }
 
   @Get('abierta')
