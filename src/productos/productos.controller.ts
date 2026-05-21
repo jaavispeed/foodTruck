@@ -34,6 +34,11 @@ export class ProductosController {
     return this.productosService.getAll(paginationDto);
   }
 
+  @Get('vigentes')
+  getVigentes(@Query() paginationDto: PaginationDto) {
+    return this.productosService.getVigentes(paginationDto);
+  }
+
   @Get(':idProducto')
   getById(@Param('idProducto') idProducto: string) {
     return this.productosService.getByIdProducto(+idProducto);

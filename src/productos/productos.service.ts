@@ -47,6 +47,17 @@ export class ProductosService {
     });
   }
 
+  async getVigentes(paginationDto: PaginationDto) {
+    const { limit = 10, offset = 0 } = paginationDto;
+    return this.productoRepository.find({
+      take: limit,
+      skip: offset,
+      where: {
+        estado: Estado.VIGENTE,
+      },
+    });
+  }
+
   async getByIdProducto(id: number) {
     const producto = await this.productoRepository.findOneBy({ id });
     if (!producto) {
