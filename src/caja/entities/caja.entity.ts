@@ -14,16 +14,12 @@ export class Caja {
   @PrimaryGeneratedColumn('increment')
   id!: number;
 
-  @Column('decimal', {
-    precision: 10,
-    scale: 2,
+  @Column('int', {
     default: 0,
   })
   montoInicial!: number;
 
-  @Column('decimal', {
-    precision: 10,
-    scale: 2,
+  @Column('int', {
     nullable: true,
   })
   montoFinal!: number;

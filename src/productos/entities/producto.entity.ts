@@ -20,9 +20,12 @@ export class Producto {
   })
   nombre!: string;
 
-  @Column('decimal', {
-    precision: 10,
-    scale: 2,
+  @Column('text', {
+    nullable: true,
+  })
+  descripcion?: string;
+
+  @Column('int', {
     default: 0,
   })
   precio!: number;

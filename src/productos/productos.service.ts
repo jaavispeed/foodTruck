@@ -1,19 +1,13 @@
-import {
-  BadRequestException,
-  Injectable,
-  InternalServerErrorException,
-  Logger,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Usuario } from '../auth/entities/usuario.entity';
 import { PaginationDto } from '../common/dtos/pagination.dto';
 import { Estado } from '../common/enum/estados.enum';
+import { handleDBExceptions } from '../common/helpers/handle-db-exceptions.helper';
 import { CreateProductoDto } from './dto/create-producto.dto';
 import { UpdateProductoDto } from './dto/update-producto.dto';
 import { Producto } from './entities/producto.entity';
-import { handleDBExceptions } from '../common/helpers/handle-db-exceptions.helper';
 
 @Injectable()
 export class ProductosService {
@@ -28,9 +22,6 @@ export class ProductosService {
     try {
       const producto = this.productoRepository.create({
         ...productoDto,
-        precio: productoDto.precio
-          ? Math.round(productoDto.precio * 100) / 100
-          : 0,
         usuario,
       });
       return await this.productoRepository.save(producto);
@@ -63,11 +54,7 @@ export class ProductosService {
     if (!producto) {
       throw new NotFoundException(`Producto con id ${id} no encontrado`);
     }
-    if (producto.estado === Estado.ELIMINADO) {
-      throw new BadRequestException(
-        `El producto con id ${id} no está disponible`,
-      );
-    }
+
     return producto;
   }
 
@@ -75,9 +62,6 @@ export class ProductosService {
     const product = await this.productoRepository.preload({
       id: id,
       ...updateProductoDto,
-      precio: updateProductoDto.precio
-        ? Math.round(updateProductoDto.precio * 100) / 100
-        : undefined,
     });
 
     if (!product) {

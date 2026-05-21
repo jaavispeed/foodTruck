@@ -3,18 +3,18 @@ import {
   ArrayMinSize,
   IsArray,
   IsEnum,
-  IsNumber,
+  IsInt,
   IsPositive,
   ValidateNested,
 } from 'class-validator';
 import { MetodoPago } from '../../common/enum/metodo-pago.enum';
 
 class OrdenProductoDto {
-  @IsNumber()
+  @IsInt()
   @IsPositive()
   productoId!: number;
 
-  @IsNumber()
+  @IsInt()
   @IsPositive()
   cantidad!: number;
 }

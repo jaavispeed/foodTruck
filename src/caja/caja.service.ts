@@ -23,7 +23,7 @@ export class CajaService {
     }
 
     const caja = this.cajaRepository.create({
-      montoInicial: Math.round(abrirCajaDto.montoInicial * 100) / 100,
+      montoInicial: abrirCajaDto.montoInicial,
       usuario,
     });
 
@@ -45,7 +45,7 @@ export class CajaService {
 
     caja.estaAbierta = false;
     caja.fechaCierre = new Date();
-    caja.montoFinal = Math.round(cerrarCajaDto.montoFinal * 100) / 100;
+    caja.montoFinal = cerrarCajaDto.montoFinal;
 
     return this.cajaRepository.save(caja);
   }

@@ -1,9 +1,10 @@
 import {
+  IsInt,
   IsNotEmpty,
-  IsNumber,
   IsOptional,
   IsPositive,
   IsString,
+  Min,
   MinLength,
 } from 'class-validator';
 
@@ -13,8 +14,11 @@ export class CreateProductoDto {
   @MinLength(3, { message: 'El nombre debe tener al menos 3 caracteres' })
   nombre!: string;
 
-  @IsNumber()
-  @IsPositive({ message: 'El precio debe ser mayor a 0' })
+  @IsInt({ message: 'El precio debe ser un número entero (CLP)' })
+  @Min(0)
+  precio!: number;
+
+  @IsString()
   @IsOptional()
-  precio?: number;
+  descripcion?: string;
 }

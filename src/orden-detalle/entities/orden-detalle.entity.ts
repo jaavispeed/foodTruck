@@ -10,10 +10,10 @@ export class OrdenDetalle {
   @Column('int')
   cantidad!: number;
 
-  @Column('decimal', { precision: 10, scale: 2 })
+  @Column('int')
   precioUnitario!: number;
 
-  @Column('decimal', { precision: 10, scale: 2 })
+  @Column('int')
   subtotal!: number;
 
   @ManyToOne(() => Producto, (producto) => producto.ordenDetalles)

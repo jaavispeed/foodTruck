@@ -1,7 +1,7 @@
-import { IsNumber, Min } from 'class-validator';
+import { IsInt, Min } from 'class-validator';
 
 export class CerrarCajaDto {
-  @IsNumber()
+  @IsInt({ message: 'El monto final debe ser un número entero (CLP)' })
   @Min(0)
   montoFinal!: number;
 }
