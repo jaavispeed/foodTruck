@@ -8,7 +8,7 @@ export class OrdenDetalleController {
   constructor(private readonly ordenDetalleService: OrdenDetalleService) {}
 
   @Get(':idOrden')
-  getByIdOrden(@Param('idOrden') idOrden: string) {
-    return this.ordenDetalleService.getByIdOrden(+idOrden);
+  getByIdOrden(@Param('idOrden') idOrden: number) {
+    return this.ordenDetalleService.getByIdOrden(idOrden);
   }
 }

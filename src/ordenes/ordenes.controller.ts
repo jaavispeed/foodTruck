@@ -20,10 +20,7 @@ export class OrdenesController {
   constructor(private readonly ordenesService: OrdenesService) {}
 
   @Post()
-  create(
-    @Body() createOrdenDto: CreateOrdenDto,
-    @GetUser() usuario: Usuario,
-  ) {
+  create(@Body() createOrdenDto: CreateOrdenDto, @GetUser() usuario: Usuario) {
     return this.ordenesService.create(createOrdenDto, usuario);
   }
 
@@ -33,12 +30,12 @@ export class OrdenesController {
   }
 
   @Get(':idOrden')
-  getById(@Param('idOrden') idOrden: string) {
-    return this.ordenesService.getByIdOrden(+idOrden);
+  getById(@Param('idOrden') idOrden: number) {
+    return this.ordenesService.getByIdOrden(idOrden);
   }
 
   @Delete(':idOrden')
-  anular(@Param('idOrden') idOrden: string) {
-    return this.ordenesService.anular(+idOrden);
+  anular(@Param('idOrden') idOrden: number) {
+    return this.ordenesService.anular(idOrden);
   }
 }

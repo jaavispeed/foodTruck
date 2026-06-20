@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Orden } from '../ordenes/entities/orden.entity';
 import { OrdenDetalle } from '../orden-detalle/entities/orden-detalle.entity';
+import { Orden } from '../ordenes/entities/orden.entity';
 
 @Injectable()
 export class DashboardService {
@@ -19,23 +19,59 @@ export class DashboardService {
 
     if (fecha) {
       const [year, month, day] = fecha.split('-');
-      startOfDay = new Date(Number(year), Number(month) - 1, Number(day), 0, 0, 0, 0);
-      endOfDay = new Date(Number(year), Number(month) - 1, Number(day), 23, 59, 59, 999);
+      startOfDay = new Date(
+        Number(year),
+        Number(month) - 1,
+        Number(day),
+        0,
+        0,
+        0,
+        0,
+      );
+      endOfDay = new Date(
+        Number(year),
+        Number(month) - 1,
+        Number(day),
+        23,
+        59,
+        59,
+        999,
+      );
     } else {
       const today = new Date();
-      startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0, 0);
-      endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59, 999);
+      startOfDay = new Date(
+        today.getFullYear(),
+        today.getMonth(),
+        today.getDate(),
+        0,
+        0,
+        0,
+        0,
+      );
+      endOfDay = new Date(
+        today.getFullYear(),
+        today.getMonth(),
+        today.getDate(),
+        23,
+        59,
+        59,
+        999,
+      );
     }
 
     const qb = this.ordenRepository.createQueryBuilder('orden');
-    qb.where('orden.fechaCreacion >= :startOfDay', { startOfDay })
-      .andWhere('orden.fechaCreacion <= :endOfDay', { endOfDay });
-    
-    const result = await qb.select('SUM(orden.total)', 'ventas')
+    qb.where('orden.fechaCreacion >= :startOfDay', { startOfDay }).andWhere(
+      'orden.fechaCreacion <= :endOfDay',
+      { endOfDay },
+    );
+
+    const result = await qb
+      .select('SUM(orden.total)', 'ventas')
       .addSelect('COUNT(orden.id)', 'cantidadOrdenes')
       .getRawOne();
-      
-    const detallesResult = await this.ordenDetalleRepository.createQueryBuilder('detalle')
+
+    const detallesResult = await this.ordenDetalleRepository
+      .createQueryBuilder('detalle')
       .innerJoin('detalle.orden', 'orden')
       .where('orden.fechaCreacion >= :startOfDay', { startOfDay })
       .andWhere('orden.fechaCreacion <= :endOfDay', { endOfDay })
@@ -45,12 +81,13 @@ export class DashboardService {
     return {
       ventas: Number(result.ventas) || 0,
       cantidadOrdenes: Number(result.cantidadOrdenes) || 0,
-      productosVendidos: Number(detallesResult.productosVendidos) || 0
+      productosVendidos: Number(detallesResult.productosVendidos) || 0,
     };
   }
 
   async getProductosMasVendidos(limit: number = 5) {
-    const result = await this.ordenDetalleRepository.createQueryBuilder('detalle')
+    const result = await this.ordenDetalleRepository
+      .createQueryBuilder('detalle')
       .innerJoin('detalle.producto', 'producto')
       .select('producto.nombre', 'producto')
       .addSelect('SUM(detalle.cantidad)', 'cantidad')
@@ -69,10 +106,10 @@ export class DashboardService {
   async getOrdenesRecientes(limit: number = 10) {
     return this.ordenRepository.find({
       order: {
-        fechaCreacion: 'DESC'
+        fechaCreacion: 'DESC',
       },
       take: limit,
-      select: ['id', 'total', 'fechaCreacion']
+      select: ['id', 'total', 'fechaCreacion'],
     });
   }
 }

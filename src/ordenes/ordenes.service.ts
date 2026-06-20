@@ -7,6 +7,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, In, Repository } from 'typeorm';
 import { Usuario } from '../auth/entities/usuario.entity';
+import { CajaService } from '../caja/caja.service';
 import { PaginationDto } from '../common/dtos/pagination.dto';
 import { Estado } from '../common/enum/estados.enum';
 import { MetodoPago } from '../common/enum/metodo-pago.enum';
@@ -17,7 +18,6 @@ import { Producto } from '../productos/entities/producto.entity';
 import { CreateOrdenDto } from './dto/create-orden.dto';
 import { Orden } from './entities/orden.entity';
 import { OrdenCalculoService } from './orden-calculo.service';
-import { CajaService } from '../caja/caja.service';
 
 @Injectable()
 export class OrdenesService {
@@ -35,7 +35,6 @@ export class OrdenesService {
   ) {}
 
   async create(createOrdenDto: CreateOrdenDto, usuario: Usuario) {
-    // Validar que exista una caja abierta
     const cajaAbierta = await this.cajaService.getCajaAbierta();
     if (!cajaAbierta) {
       throw new BadRequestException(
@@ -45,13 +44,11 @@ export class OrdenesService {
 
     const { orden: productosOrden, metodoPago } = createOrdenDto;
 
-    // Buscar todos los productos en una sola consulta
     const productIds = productosOrden.map((d) => d.productoId);
     const productos = await this.productoRepository.findBy({
       id: In(productIds),
     });
 
-    // Verificar que todos los productos existen
     if (productos.length !== productIds.length) {
       const encontradosIds = productos.map((p) => p.id);
       const noEncontrados = productIds.filter(
@@ -62,7 +59,6 @@ export class OrdenesService {
       );
     }
 
-    // Verificar que todos los productos estén vigentes
     const productosEliminados = productos.filter(
       (p) => p.estado === Estado.ELIMINADO,
     );
@@ -73,7 +69,6 @@ export class OrdenesService {
       );
     }
 
-    // Determinar el estado según el método de pago
     const estadoOrden =
       metodoPago === MetodoPago.FIADO ? Estado.PENDIENTE : Estado.VIGENTE;
 

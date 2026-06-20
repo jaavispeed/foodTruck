@@ -13,8 +13,8 @@ export class DashboardController {
   }
 
   @Get('productos-mas-vendidos')
-  getProductosMasVendidos(@Query('limit') limit?: string) {
-    return this.dashboardService.getProductosMasVendidos(limit ? +limit : 5);
+  getProductosMasVendidos(@Query('limit') limit?: number) {
+    return this.dashboardService.getProductosMasVendidos(limit ? limit : 5);
   }
 
   @Get('ordenes-recientes')
