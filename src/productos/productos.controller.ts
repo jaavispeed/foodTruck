@@ -40,20 +40,20 @@ export class ProductosController {
   }
 
   @Get(':idProducto')
-  getById(@Param('idProducto') idProducto: string) {
-    return this.productosService.getByIdProducto(+idProducto);
+  getById(@Param('idProducto') idProducto: number) {
+    return this.productosService.getByIdProducto(idProducto);
   }
 
   @Patch(':idProducto')
   update(
-    @Param('idProducto') idProducto: string,
+    @Param('idProducto') idProducto: number,
     @Body() updateProductoDto: UpdateProductoDto,
   ) {
-    return this.productosService.update(+idProducto, updateProductoDto);
+    return this.productosService.update(idProducto, updateProductoDto);
   }
 
   @Delete(':idProducto')
-  softDelete(@Param('idProducto') idProducto: string) {
-    return this.productosService.softDelete(+idProducto);
+  softDelete(@Param('idProducto') idProducto: number) {
+    return this.productosService.softDelete(idProducto);
   }
 }

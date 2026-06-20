@@ -6,10 +6,11 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Estado } from '../../common/enum/estados.enum';
-import { Producto } from '../../productos/entities/producto.entity';
-import { Orden } from '../../ordenes/entities/orden.entity';
 import { Caja } from '../../caja/entities/caja.entity';
+import { Estado } from '../../common/enum/estados.enum';
+import { Gasto } from '../../gastos/entities/gasto.entity';
+import { Orden } from '../../ordenes/entities/orden.entity';
+import { Producto } from '../../productos/entities/producto.entity';
 
 @Entity()
 export class Usuario {
@@ -53,6 +54,9 @@ export class Usuario {
 
   @OneToMany(() => Caja, (caja) => caja.usuario)
   cajas!: Caja[];
+
+  @OneToMany(() => Gasto, (gasto) => gasto.usuario)
+  gastos!: Gasto[];
 
   @BeforeInsert()
   checkFieldsBeforeInsert() {

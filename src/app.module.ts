@@ -2,12 +2,13 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
-import { CommonModule } from './common/common.module';
-import { ProductosModule } from './productos/productos.module';
-import { OrdenesModule } from './ordenes/ordenes.module';
-import { OrdenDetalleModule } from './orden-detalle/orden-detalle.module';
-import { DashboardModule } from './dashboard/dashboard.module';
 import { CajaModule } from './caja/caja.module';
+import { CommonModule } from './common/common.module';
+import { DashboardModule } from './dashboard/dashboard.module';
+import { GastosModule } from './gastos/gastos.module';
+import { OrdenDetalleModule } from './orden-detalle/orden-detalle.module';
+import { OrdenesModule } from './ordenes/ordenes.module';
+import { ProductosModule } from './productos/productos.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { CajaModule } from './caja/caja.module';
     OrdenDetalleModule,
     DashboardModule,
     CajaModule,
+    GastosModule,
   ],
   controllers: [],
   providers: [],
