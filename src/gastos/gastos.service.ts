@@ -51,10 +51,17 @@ export class GastosService {
   }
 
   async update(id: number, updateGastoDto: UpdateGastoDto) {
+    console.log('DTO:', updateGastoDto);
+    console.log('Objeto preload:', {
+      id,
+      ...updateGastoDto,
+    });
+
     const gasto = await this.gastoRepository.preload({
       id,
       ...updateGastoDto,
     });
+    console.log('Preload:', gasto);
 
     if (!gasto) {
       throw new NotFoundException(`Gasto con id ${id} no encontrado`);

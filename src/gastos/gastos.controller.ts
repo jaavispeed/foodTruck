@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
   Query,
@@ -37,7 +38,10 @@ export class GastosController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: number, @Body() updateGastoDto: UpdateGastoDto) {
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateGastoDto: UpdateGastoDto,
+  ) {
     return this.gastosService.update(id, updateGastoDto);
   }
 

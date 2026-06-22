@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
   Query,
@@ -46,7 +47,7 @@ export class ProductosController {
 
   @Patch(':idProducto')
   update(
-    @Param('idProducto') idProducto: number,
+    @Param('idProducto', ParseIntPipe) idProducto: number,
     @Body() updateProductoDto: UpdateProductoDto,
   ) {
     return this.productosService.update(idProducto, updateProductoDto);
