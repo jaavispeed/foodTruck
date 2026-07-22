@@ -3,6 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { OrdenDetalle } from '../orden-detalle/entities/orden-detalle.entity';
 import { Orden } from '../ordenes/entities/orden.entity';
+import { Gasto } from '../gastos/entities/gasto.entity';
+import { Estado } from '../common/enum/estados.enum';
 
 @Injectable()
 export class DashboardService {
@@ -11,6 +13,8 @@ export class DashboardService {
     private readonly ordenRepository: Repository<Orden>,
     @InjectRepository(OrdenDetalle)
     private readonly ordenDetalleRepository: Repository<OrdenDetalle>,
+    @InjectRepository(Gasto)
+    private readonly gastoRepository: Repository<Gasto>,
   ) {}
 
   async getResumen(fecha?: string) {
@@ -78,10 +82,23 @@ export class DashboardService {
       .select('SUM(detalle.cantidad)', 'productosVendidos')
       .getRawOne();
 
+    const gastosResult = await this.gastoRepository
+      .createQueryBuilder('gasto')
+      .where('gasto.fechaCreacion >= :startOfDay', { startOfDay })
+      .andWhere('gasto.fechaCreacion <= :endOfDay', { endOfDay })
+      .andWhere('gasto.estado = :estado', { estado: Estado.VIGENTE })
+      .select('SUM(gasto.monto)', 'totalGastos')
+      .getRawOne();
+
+    const ventas = Number(result.ventas) || 0;
+    const gastos = Number(gastosResult.totalGastos) || 0;
+
     return {
-      ventas: Number(result.ventas) || 0,
+      ventas,
       cantidadOrdenes: Number(result.cantidadOrdenes) || 0,
       productosVendidos: Number(detallesResult.productosVendidos) || 0,
+      gastos,
+      ganancias: ventas - gastos,
     };
   }
 
