@@ -1,6 +1,6 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { ILike, Repository } from 'typeorm';
 import { Usuario } from '../auth/entities/usuario.entity';
 import { PaginationDto } from '../common/dtos/pagination.dto';
 import { Estado } from '../common/enum/estados.enum';
@@ -31,20 +31,34 @@ export class ProductosService {
   }
 
   async getAll(paginationDto: PaginationDto) {
-    const { limit = 10, offset = 0 } = paginationDto;
+    const { limit = 10, offset = 0, search } = paginationDto;
+    
+    const whereCondition = search ? { nombre: ILike(`%${search}%`) } : {};
+
     return this.productoRepository.find({
       take: limit,
       skip: offset,
+      where: whereCondition,
+      order: {
+        fechaCreacion: 'DESC',
+      },
     });
   }
 
   async getVigentes(paginationDto: PaginationDto) {
-    const { limit = 10, offset = 0 } = paginationDto;
+    const { limit = 10, offset = 0, search } = paginationDto;
+    
+    const whereCondition: any = { estado: Estado.VIGENTE };
+    if (search) {
+      whereCondition.nombre = ILike(`%${search}%`);
+    }
+
     return this.productoRepository.find({
       take: limit,
       skip: offset,
-      where: {
-        estado: Estado.VIGENTE,
+      where: whereCondition,
+      order: {
+        fechaCreacion: 'DESC',
       },
     });
   }
