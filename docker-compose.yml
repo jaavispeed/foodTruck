@@ -7,6 +7,8 @@ services:
       POSTGRES_DB: ${DB_NAME}
       TZ: ${TZ}
       PGTZ: ${TZ}
+      PGOPTIONS: '-c timezone=America/Santiago'
+    command: postgres -c timezone=America/Santiago
     ports:
       - '5432:5432'
     volumes:
