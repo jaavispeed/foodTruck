@@ -5,6 +5,7 @@ import { OrdenDetalle } from '../orden-detalle/entities/orden-detalle.entity';
 import { Orden } from '../ordenes/entities/orden.entity';
 import { Gasto } from '../gastos/entities/gasto.entity';
 import { Estado } from '../common/enum/estados.enum';
+import { DashboardCalculoService } from './dashboard-calculo.service';
 
 @Injectable()
 export class DashboardService {
@@ -15,58 +16,60 @@ export class DashboardService {
     private readonly ordenDetalleRepository: Repository<OrdenDetalle>,
     @InjectRepository(Gasto)
     private readonly gastoRepository: Repository<Gasto>,
+    private readonly dashboardCalculoService: DashboardCalculoService,
   ) {}
 
-  async getResumen(fecha?: string) {
-    let startOfDay: Date;
-    let endOfDay: Date;
+  private parseDateRange(fecha?: string): { startOfRange: Date; endOfRange: Date } {
+    let startOfRange: Date;
+    let endOfRange: Date;
 
     if (fecha) {
-      const [year, month, day] = fecha.split('-');
-      startOfDay = new Date(
-        Number(year),
-        Number(month) - 1,
-        Number(day),
-        0,
-        0,
-        0,
-        0,
-      );
-      endOfDay = new Date(
-        Number(year),
-        Number(month) - 1,
-        Number(day),
-        23,
-        59,
-        59,
-        999,
-      );
+      const parts = fecha.split('-');
+      if (parts.length === 2) {
+        // Formato YYYY-MM
+        const year = Number(parts[0]);
+        const month = Number(parts[1]) - 1;
+        startOfRange = new Date(year, month, 1, 0, 0, 0, 0);
+        endOfRange = new Date(year, month + 1, 0, 23, 59, 59, 999);
+      } else {
+        // Formato YYYY-MM-DD
+        const year = Number(parts[0]);
+        const month = Number(parts[1]) - 1;
+        const day = Number(parts[2]);
+        startOfRange = new Date(year, month, day, 0, 0, 0, 0);
+        endOfRange = new Date(year, month, day, 23, 59, 59, 999);
+      }
     } else {
       const today = new Date();
-      startOfDay = new Date(
+      startOfRange = new Date(
         today.getFullYear(),
         today.getMonth(),
-        today.getDate(),
+        1,
         0,
         0,
         0,
         0,
       );
-      endOfDay = new Date(
+      endOfRange = new Date(
         today.getFullYear(),
-        today.getMonth(),
-        today.getDate(),
+        today.getMonth() + 1,
+        0,
         23,
         59,
         59,
         999,
       );
     }
+    return { startOfRange, endOfRange };
+  }
+
+  async getResumen(fecha?: string) {
+    const { startOfRange, endOfRange } = this.parseDateRange(fecha);
 
     const qb = this.ordenRepository.createQueryBuilder('orden');
-    qb.where('orden.fechaCreacion >= :startOfDay', { startOfDay }).andWhere(
-      'orden.fechaCreacion <= :endOfDay',
-      { endOfDay },
+    qb.where('orden.fechaCreacion >= :startOfRange', { startOfRange }).andWhere(
+      'orden.fechaCreacion <= :endOfRange',
+      { endOfRange },
     );
 
     const result = await qb
@@ -77,21 +80,36 @@ export class DashboardService {
     const detallesResult = await this.ordenDetalleRepository
       .createQueryBuilder('detalle')
       .innerJoin('detalle.orden', 'orden')
-      .where('orden.fechaCreacion >= :startOfDay', { startOfDay })
-      .andWhere('orden.fechaCreacion <= :endOfDay', { endOfDay })
+      .where('orden.fechaCreacion >= :startOfRange', { startOfRange })
+      .andWhere('orden.fechaCreacion <= :endOfRange', { endOfRange })
       .select('SUM(detalle.cantidad)', 'productosVendidos')
       .getRawOne();
 
     const gastosResult = await this.gastoRepository
       .createQueryBuilder('gasto')
-      .where('gasto.fechaCreacion >= :startOfDay', { startOfDay })
-      .andWhere('gasto.fechaCreacion <= :endOfDay', { endOfDay })
+      .leftJoin('gasto.categoria', 'categoria')
+      .where('gasto.fechaCreacion >= :startOfRange', { startOfRange })
+      .andWhere('gasto.fechaCreacion <= :endOfRange', { endOfRange })
       .andWhere('gasto.estado = :estado', { estado: Estado.VIGENTE })
+      .andWhere(
+        '(categoria.id IS NULL OR (LOWER(categoria.nombre) NOT LIKE :fijo AND LOWER(categoria.nombre) NOT LIKE :deuda AND LOWER(categoria.nombre) NOT LIKE :financiamiento))',
+        {
+          fijo: '%fijo%',
+          deuda: '%deuda%',
+          financiamiento: '%financiamiento%',
+        },
+      )
       .select('SUM(gasto.monto)', 'totalGastos')
       .getRawOne();
 
     const ventas = Number(result.ventas) || 0;
     const gastos = Number(gastosResult.totalGastos) || 0;
+
+    // Calcular la meta diaria en base a los gastos fijos del mes
+    const startOfMonth = new Date(startOfRange.getFullYear(), startOfRange.getMonth(), 1, 0, 0, 0, 0);
+    const endOfMonth = new Date(startOfRange.getFullYear(), startOfRange.getMonth() + 1, 0, 23, 59, 59, 999);
+    
+    const metaDiaria = await this.dashboardCalculoService.calcularMetaDiaria(startOfMonth, endOfMonth);
 
     return {
       ventas,
@@ -99,13 +117,19 @@ export class DashboardService {
       productosVendidos: Number(detallesResult.productosVendidos) || 0,
       gastos,
       ganancias: ventas - gastos,
+      metaDiaria,
     };
   }
 
-  async getProductosMasVendidos(limit: number = 5) {
+  async getProductosMasVendidos(fecha?: string, limit: number = 5) {
+    const { startOfRange, endOfRange } = this.parseDateRange(fecha);
+
     const result = await this.ordenDetalleRepository
       .createQueryBuilder('detalle')
+      .innerJoin('detalle.orden', 'orden')
       .innerJoin('detalle.producto', 'producto')
+      .where('orden.fechaCreacion >= :startOfRange', { startOfRange })
+      .andWhere('orden.fechaCreacion <= :endOfRange', { endOfRange })
       .select('producto.nombre', 'producto')
       .addSelect('SUM(detalle.cantidad)', 'cantidad')
       .groupBy('producto.id')
@@ -120,13 +144,15 @@ export class DashboardService {
     }));
   }
 
-  async getOrdenesRecientes(limit: number = 10) {
-    return this.ordenRepository.find({
-      order: {
-        fechaCreacion: 'DESC',
-      },
-      take: limit,
-      select: ['id', 'total', 'fechaCreacion'],
-    });
+  async getOrdenesRecientes(fecha?: string, limit: number = 10) {
+    const { startOfRange, endOfRange } = this.parseDateRange(fecha);
+
+    return this.ordenRepository.createQueryBuilder('orden')
+      .where('orden.fechaCreacion >= :startOfRange', { startOfRange })
+      .andWhere('orden.fechaCreacion <= :endOfRange', { endOfRange })
+      .orderBy('orden.fechaCreacion', 'DESC')
+      .limit(limit)
+      .select(['orden.id', 'orden.total', 'orden.fechaCreacion'])
+      .getMany();
   }
 }

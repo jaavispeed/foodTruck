@@ -20,8 +20,10 @@ export class GastosService {
 
   async create(createGastoDto: CreateGastoDto, usuario: Usuario) {
     try {
+      const { categoriaId, ...gastoData } = createGastoDto;
       const gasto = this.gastoRepository.create({
-        ...createGastoDto,
+        ...gastoData,
+        categoria: categoriaId ? { id: categoriaId } : undefined,
         usuario,
       });
 
@@ -51,9 +53,11 @@ export class GastosService {
   }
 
   async update(id: number, updateGastoDto: UpdateGastoDto) {
+    const { categoriaId, ...gastoData } = updateGastoDto;
     const gasto = await this.gastoRepository.preload({
       id,
-      ...updateGastoDto,
+      ...gastoData,
+      ...(categoriaId !== undefined ? { categoria: categoriaId ? { id: categoriaId } : undefined } : {}),
     });
 
     if (!gasto) {

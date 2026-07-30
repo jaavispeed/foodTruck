@@ -13,12 +13,15 @@ export class DashboardController {
   }
 
   @Get('productos-mas-vendidos')
-  getProductosMasVendidos(@Query('limit') limit?: number) {
-    return this.dashboardService.getProductosMasVendidos(limit ? limit : 5);
+  getProductosMasVendidos(
+    @Query('fecha') fecha?: string,
+    @Query('limit') limit?: number,
+  ) {
+    return this.dashboardService.getProductosMasVendidos(fecha, limit ? limit : 5);
   }
 
   @Get('ordenes-recientes')
-  getOrdenesRecientes() {
-    return this.dashboardService.getOrdenesRecientes();
+  getOrdenesRecientes(@Query('fecha') fecha?: string) {
+    return this.dashboardService.getOrdenesRecientes(fecha);
   }
 }
