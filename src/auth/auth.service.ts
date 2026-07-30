@@ -11,6 +11,7 @@ import { Repository } from 'typeorm';
 import { JwtPayload } from '../interfaces/jwt-payload.interfaces';
 import { LoginUserDto } from './dto/login/login-user.dto';
 import { RegisterUserDto } from './dto/register/register-user.dto';
+import { UpdateProfileDto } from './dto/update/update-profile.dto';
 import { Usuario } from './entities/usuario.entity';
 import { handleDBExceptions } from '../common/helpers/handle-db-exceptions.helper';
 import { Logger } from '@nestjs/common';
@@ -93,5 +94,33 @@ export class AuthService {
   private getJwtToken(payload: JwtPayload) {
     const token = this.jwtService.sign(payload);
     return token;
+  }
+
+  async updateProfile(usuario: Usuario, updateProfileDto: UpdateProfileDto) {
+    try {
+      const user = await this.userRepository.preload({
+        id: usuario.id,
+        ...updateProfileDto,
+      });
+
+      if (!user) {
+        throw new BadRequestException('Usuario no encontrado');
+      }
+
+      const updatedUser = await this.userRepository.save(user);
+
+      return {
+        user: {
+          id: updatedUser.id,
+          email: updatedUser.email,
+          nombre: updatedUser.nombre,
+          apellido: updatedUser.apellido,
+          estado: updatedUser.estado,
+          role: updatedUser.rol,
+        },
+      };
+    } catch (error) {
+      handleDBExceptions(error, this.logger);
+    }
   }
 }

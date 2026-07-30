@@ -1,9 +1,10 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, Patch } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Auth } from './decorators/auth.decorator';
 import { GetUser } from './decorators/get-user.decorator';
 import { LoginUserDto } from './dto/login/login-user.dto';
 import { RegisterUserDto } from './dto/register/register-user.dto';
+import { UpdateProfileDto } from './dto/update/update-profile.dto';
 import { Usuario } from './entities/usuario.entity';
 
 @Controller('auth')
@@ -24,5 +25,14 @@ export class AuthController {
   @Auth()
   checkAuthStatus(@GetUser() usuario: Usuario) {
     return this.authService.checkAuthStatus(usuario);
+  }
+
+  @Patch('profile')
+  @Auth()
+  updateProfile(
+    @GetUser() usuario: Usuario,
+    @Body() updateProfileDto: UpdateProfileDto,
+  ) {
+    return this.authService.updateProfile(usuario, updateProfileDto);
   }
 }
