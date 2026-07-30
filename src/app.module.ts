@@ -9,6 +9,7 @@ import { GastosModule } from './gastos/gastos.module';
 import { OrdenDetalleModule } from './orden-detalle/orden-detalle.module';
 import { OrdenesModule } from './ordenes/ordenes.module';
 import { ProductosModule } from './productos/productos.module';
+import { CategoriasModule } from './categorias/categorias.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { ProductosModule } from './productos/productos.module';
     DashboardModule,
     CajaModule,
     GastosModule,
+    CategoriasModule,
   ],
   controllers: [],
   providers: [],

@@ -7,6 +7,7 @@ import {
 } from 'typeorm';
 import { Usuario } from '../../auth/entities/usuario.entity';
 import { Estado } from '../../common/enum/estados.enum';
+import { Categoria } from '../../categorias/entities/categoria.entity';
 
 @Entity()
 export class Gasto {
@@ -36,4 +37,6 @@ export class Gasto {
     eager: true,
   })
   usuario!: Usuario;
+  @ManyToOne(() => Categoria, (categoria) => categoria.gastos, { eager: true, nullable: true })
+  categoria!: Categoria;
 }

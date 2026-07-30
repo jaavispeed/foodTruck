@@ -10,6 +10,8 @@ import { Usuario } from '../../auth/entities/usuario.entity';
 import { Estado } from '../../common/enum/estados.enum';
 import { OrdenDetalle } from '../../orden-detalle/entities/orden-detalle.entity';
 
+import { Categoria } from '../../categorias/entities/categoria.entity';
+
 @Entity()
 export class Producto {
   @PrimaryGeneratedColumn('increment')
@@ -48,4 +50,6 @@ export class Producto {
 
   @OneToMany(() => OrdenDetalle, (ordenDetalle) => ordenDetalle.producto)
   ordenDetalles!: OrdenDetalle[];
+  @ManyToOne(() => Categoria, (categoria) => categoria.productos, { eager: true, nullable: true })
+  categoria!: Categoria;
 }
