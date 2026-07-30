@@ -1,15 +1,22 @@
-import { Type } from 'class-transformer';
-import { IsDate, IsOptional } from 'class-validator';
+import { IsString, IsOptional, IsEnum } from 'class-validator';
 import { PaginationDto } from '../../common/dtos/pagination.dto';
+import { MetodoPago } from '../../common/enum/metodo-pago.enum';
+import { Estado } from '../../common/enum/estados.enum';
 
 export class GetOrdenesDto extends PaginationDto {
   @IsOptional()
-  @Type(() => Date)
-  @IsDate()
-  desde?: Date;
+  @IsString()
+  desde?: string;
 
   @IsOptional()
-  @Type(() => Date)
-  @IsDate()
-  hasta?: Date;
+  @IsString()
+  hasta?: string;
+
+  @IsOptional()
+  @IsEnum(MetodoPago)
+  metodoPago?: MetodoPago;
+
+  @IsOptional()
+  @IsEnum(Estado)
+  estado?: Estado;
 }

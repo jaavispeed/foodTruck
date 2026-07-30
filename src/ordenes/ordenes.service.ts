@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, In, Repository, Between, MoreThanOrEqual, LessThanOrEqual } from 'typeorm';
+import { DataSource, In, Repository, Between, MoreThanOrEqual, LessThanOrEqual, Not } from 'typeorm';
 import { Usuario } from '../auth/entities/usuario.entity';
 import { CajaService } from '../caja/caja.service';
 import { GetOrdenesDto } from './dto/get-ordenes.dto';
@@ -117,15 +117,38 @@ export class OrdenesService {
   }
 
   async getAll(paginationDto: GetOrdenesDto) {
-    const { limit = 10, offset = 0, desde, hasta } = paginationDto;
+    const { limit = 10, offset = 0, desde, hasta, metodoPago, estado } = paginationDto;
     
+    let queryDesde: Date | undefined;
+    let queryHasta: Date | undefined;
+
+    if (desde) {
+      const [year, month, day] = desde.split('-');
+      queryDesde = new Date(Number(year), Number(month) - 1, Number(day));
+      queryDesde.setHours(0, 0, 0, 0);
+    }
+    
+    if (hasta) {
+      const [year, month, day] = hasta.split('-');
+      queryHasta = new Date(Number(year), Number(month) - 1, Number(day));
+      queryHasta.setHours(23, 59, 59, 999);
+    }
+
     const where: any = {};
-    if (desde && hasta) {
-      where.fechaCreacion = Between(desde, hasta);
-    } else if (desde) {
-      where.fechaCreacion = MoreThanOrEqual(desde);
-    } else if (hasta) {
-      where.fechaCreacion = LessThanOrEqual(hasta);
+    if (queryDesde && queryHasta) {
+      where.fechaCreacion = Between(queryDesde, queryHasta);
+    } else if (queryDesde) {
+      where.fechaCreacion = MoreThanOrEqual(queryDesde);
+    } else if (queryHasta) {
+      where.fechaCreacion = LessThanOrEqual(queryHasta);
+    }
+
+    if (metodoPago) {
+      where.metodoPago = metodoPago;
+    }
+    
+    if (estado) {
+      where.estado = estado;
     }
 
     const [data, total] = await this.ordenRepository.findAndCount({
@@ -137,9 +160,12 @@ export class OrdenesService {
     });
 
     const query = this.ordenRepository.createQueryBuilder('orden');
-    if (desde) query.andWhere('orden.fechaCreacion >= :desde', { desde });
-    if (hasta) query.andWhere('orden.fechaCreacion <= :hasta', { hasta });
-    query.andWhere('orden.estado != :estado', { estado: Estado.ELIMINADO });
+    if (queryDesde) query.andWhere('orden.fechaCreacion >= :desde', { desde: queryDesde });
+    if (queryHasta) query.andWhere('orden.fechaCreacion <= :hasta', { hasta: queryHasta });
+    if (metodoPago) query.andWhere('orden.metodoPago = :metodoPago', { metodoPago });
+    if (estado) {
+      query.andWhere('orden.estado = :estadoFiltro', { estadoFiltro: estado });
+    }
     
     const { sumaVentas } = await query
       .select('SUM(orden.total)', 'sumaVentas')

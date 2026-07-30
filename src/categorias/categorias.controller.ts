@@ -3,7 +3,9 @@ import { CategoriasService } from './categorias.service';
 import { CreateCategoriaDto } from './dto/create-categoria.dto';
 import { UpdateCategoriaDto } from './dto/update-categoria.dto';
 import { TipoCategoria } from '../common/enum/tipo-categoria.enum';
+import { Auth } from '../auth/decorators/auth.decorator';
 
+@Auth()
 @Controller('categorias')
 export class CategoriasController {
   constructor(private readonly categoriasService: CategoriasService) {}
