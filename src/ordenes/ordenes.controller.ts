@@ -10,7 +10,7 @@ import {
 import { Auth } from '../auth/decorators/auth.decorator';
 import { GetUser } from '../auth/decorators/get-user.decorator';
 import { Usuario } from '../auth/entities/usuario.entity';
-import { PaginationDto } from '../common/dtos/pagination.dto';
+import { GetOrdenesDto } from './dto/get-ordenes.dto';
 import { CreateOrdenDto } from './dto/create-orden.dto';
 import { OrdenesService } from './ordenes.service';
 
@@ -25,7 +25,7 @@ export class OrdenesController {
   }
 
   @Get()
-  getAll(@Query() paginationDto: PaginationDto) {
+  getAll(@Query() paginationDto: GetOrdenesDto) {
     return this.ordenesService.getAll(paginationDto);
   }
 

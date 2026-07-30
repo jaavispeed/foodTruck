@@ -5,10 +5,10 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, In, Repository } from 'typeorm';
+import { DataSource, In, Repository, Between, MoreThanOrEqual, LessThanOrEqual } from 'typeorm';
 import { Usuario } from '../auth/entities/usuario.entity';
 import { CajaService } from '../caja/caja.service';
-import { PaginationDto } from '../common/dtos/pagination.dto';
+import { GetOrdenesDto } from './dto/get-ordenes.dto';
 import { Estado } from '../common/enum/estados.enum';
 import { MetodoPago } from '../common/enum/metodo-pago.enum';
 import { handleDBExceptions } from '../common/helpers/handle-db-exceptions.helper';
@@ -116,13 +116,40 @@ export class OrdenesService {
     }
   }
 
-  async getAll(paginationDto: PaginationDto) {
-    const { limit = 10, offset = 0 } = paginationDto;
-    return this.ordenRepository.find({
+  async getAll(paginationDto: GetOrdenesDto) {
+    const { limit = 10, offset = 0, desde, hasta } = paginationDto;
+    
+    const where: any = {};
+    if (desde && hasta) {
+      where.fechaCreacion = Between(desde, hasta);
+    } else if (desde) {
+      where.fechaCreacion = MoreThanOrEqual(desde);
+    } else if (hasta) {
+      where.fechaCreacion = LessThanOrEqual(hasta);
+    }
+
+    const [data, total] = await this.ordenRepository.findAndCount({
       take: limit,
       skip: offset,
+      where,
       relations: ['caja', 'usuario'],
+      order: { fechaCreacion: 'DESC' },
     });
+
+    const query = this.ordenRepository.createQueryBuilder('orden');
+    if (desde) query.andWhere('orden.fechaCreacion >= :desde', { desde });
+    if (hasta) query.andWhere('orden.fechaCreacion <= :hasta', { hasta });
+    query.andWhere('orden.estado != :estado', { estado: Estado.ELIMINADO });
+    
+    const { sumaVentas } = await query
+      .select('SUM(orden.total)', 'sumaVentas')
+      .getRawOne();
+
+    return {
+      data,
+      total,
+      sumaTotalVentas: Number(sumaVentas) || 0,
+    };
   }
 
   async getByIdOrden(id: number) {
