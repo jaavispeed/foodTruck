@@ -6,11 +6,11 @@ import { OrdenDetalle } from '../orden-detalle/entities/orden-detalle.entity';
 import { Orden } from '../ordenes/entities/orden.entity';
 import { DashboardController } from './dashboard.controller';
 import { DashboardService } from './dashboard.service';
-import { DashboardCalculoService } from './dashboard-calculo.service';
+import { DeudasModule } from '../deudas/deudas.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Orden, OrdenDetalle, Gasto]), AuthModule],
+  imports: [TypeOrmModule.forFeature([Orden, OrdenDetalle, Gasto]), AuthModule, DeudasModule],
   controllers: [DashboardController],
-  providers: [DashboardService, DashboardCalculoService],
+  providers: [DashboardService],
 })
 export class DashboardModule {}

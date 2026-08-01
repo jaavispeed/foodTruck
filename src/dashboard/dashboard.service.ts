@@ -5,7 +5,7 @@ import { OrdenDetalle } from '../orden-detalle/entities/orden-detalle.entity';
 import { Orden } from '../ordenes/entities/orden.entity';
 import { Gasto } from '../gastos/entities/gasto.entity';
 import { Estado } from '../common/enum/estados.enum';
-import { DashboardCalculoService } from './dashboard-calculo.service';
+import { DeudasService } from '../deudas/deudas.service';
 
 @Injectable()
 export class DashboardService {
@@ -16,7 +16,7 @@ export class DashboardService {
     private readonly ordenDetalleRepository: Repository<OrdenDetalle>,
     @InjectRepository(Gasto)
     private readonly gastoRepository: Repository<Gasto>,
-    private readonly dashboardCalculoService: DashboardCalculoService,
+    private readonly deudasService: DeudasService,
   ) {}
 
   private parseDateRange(fecha?: string): { startOfRange: Date; endOfRange: Date } {
@@ -109,7 +109,7 @@ export class DashboardService {
     const startOfMonth = new Date(startOfRange.getFullYear(), startOfRange.getMonth(), 1, 0, 0, 0, 0);
     const endOfMonth = new Date(startOfRange.getFullYear(), startOfRange.getMonth() + 1, 0, 23, 59, 59, 999);
     
-    const metaDiaria = await this.dashboardCalculoService.calcularMetaDiaria(startOfMonth, endOfMonth);
+    const metas = await this.deudasService.calcularMetas(startOfMonth, endOfMonth);
 
     return {
       ventas,
@@ -117,7 +117,8 @@ export class DashboardService {
       productosVendidos: Number(detallesResult.productosVendidos) || 0,
       gastos,
       ganancias: ventas - gastos,
-      metaDiaria,
+      metaDiaria: metas.metaDiaria,
+      metaMensual: metas.metaMensual,
     };
   }
 

@@ -11,6 +11,7 @@ import { Estado } from '../../common/enum/estados.enum';
 import { Gasto } from '../../gastos/entities/gasto.entity';
 import { Orden } from '../../ordenes/entities/orden.entity';
 import { Producto } from '../../productos/entities/producto.entity';
+import { Deuda } from '../../deudas/entities/deuda.entity';
 
 @Entity()
 export class Usuario {
@@ -57,6 +58,9 @@ export class Usuario {
 
   @OneToMany(() => Gasto, (gasto) => gasto.usuario)
   gastos!: Gasto[];
+
+  @OneToMany(() => Deuda, (deuda) => deuda.usuario)
+  deudas!: Deuda[];
 
   @BeforeInsert()
   checkFieldsBeforeInsert() {

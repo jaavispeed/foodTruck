@@ -8,6 +8,7 @@ import {
 import { Usuario } from '../../auth/entities/usuario.entity';
 import { Estado } from '../../common/enum/estados.enum';
 import { Categoria } from '../../categorias/entities/categoria.entity';
+import { Deuda } from '../../deudas/entities/deuda.entity';
 
 @Entity()
 export class Gasto {
@@ -39,4 +40,7 @@ export class Gasto {
   usuario!: Usuario;
   @ManyToOne(() => Categoria, (categoria) => categoria.gastos, { eager: true, nullable: true })
   categoria!: Categoria;
+
+  @ManyToOne(() => Deuda, (deuda) => deuda.gastosAsociados, { nullable: true })
+  deudaAsociada!: Deuda;
 }
