@@ -1,11 +1,12 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Between, LessThanOrEqual, MoreThanOrEqual, Repository } from 'typeorm';
 import { Usuario } from '../auth/entities/usuario.entity';
 import { PaginationDto } from '../common/dtos/pagination.dto';
 import { Estado } from '../common/enum/estados.enum';
 import { handleDBExceptions } from '../common/helpers/handle-db-exceptions.helper';
 import { CreateGastoDto } from './dto/create-gasto.dto';
+import { GetGastosDto } from './dto/get-gastos.dto';
 import { UpdateGastoDto } from './dto/update-gasto.dto';
 import { Gasto } from './entities/gasto.entity';
 
@@ -33,13 +34,63 @@ export class GastosService {
     }
   }
 
-  async getAll(paginationDto: PaginationDto) {
-    const { limit = 10, offset = 0 } = paginationDto;
+  async getAll(paginationDto: GetGastosDto) {
+    const { limit = 10, offset = 0, desde, hasta, estado, categoriaId } = paginationDto;
 
-    return this.gastoRepository.find({
+    let queryDesde: Date | undefined;
+    let queryHasta: Date | undefined;
+
+    if (desde) {
+      const [year, month, day] = desde.split('-');
+      queryDesde = new Date(Number(year), Number(month) - 1, Number(day));
+      queryDesde.setHours(0, 0, 0, 0);
+    }
+    
+    if (hasta) {
+      const [year, month, day] = hasta.split('-');
+      queryHasta = new Date(Number(year), Number(month) - 1, Number(day));
+      queryHasta.setHours(23, 59, 59, 999);
+    }
+
+    const where: any = {};
+    if (queryDesde && queryHasta) {
+      where.fechaCreacion = Between(queryDesde, queryHasta);
+    } else if (queryDesde) {
+      where.fechaCreacion = MoreThanOrEqual(queryDesde);
+    } else if (queryHasta) {
+      where.fechaCreacion = LessThanOrEqual(queryHasta);
+    }
+
+    if (estado) {
+      where.estado = estado;
+    }
+    
+    if (categoriaId) {
+      where.categoria = { id: categoriaId };
+    }
+
+    const [data, total] = await this.gastoRepository.findAndCount({
       take: limit,
       skip: offset,
+      where,
+      order: { fechaCreacion: 'DESC' },
     });
+
+    const query = this.gastoRepository.createQueryBuilder('gasto');
+    if (queryDesde) query.andWhere('gasto.fechaCreacion >= :desde', { desde: queryDesde });
+    if (queryHasta) query.andWhere('gasto.fechaCreacion <= :hasta', { hasta: queryHasta });
+    if (estado) query.andWhere('gasto.estado = :estadoFiltro', { estadoFiltro: estado });
+    if (categoriaId) query.andWhere('gasto.categoriaId = :categoriaId', { categoriaId });
+
+    const { sumaGastos } = await query
+      .select('SUM(gasto.monto)', 'sumaGastos')
+      .getRawOne();
+
+    return {
+      data,
+      total,
+      sumaTotalGastos: Number(sumaGastos) || 0,
+    };
   }
 
   async getByIdGasto(id: number) {

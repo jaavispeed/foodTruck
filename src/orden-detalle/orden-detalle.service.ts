@@ -15,18 +15,19 @@ export class OrdenDetalleService {
   ) {}
 
   createDetalle(
-    detalleDto: CreateOrdenDetalleDto,
+    detalleDto: CreateOrdenDetalleDto & { precioPersonalizado?: number },
     producto: Producto,
     manager: EntityManager,
   ): OrdenDetalle {
+    const precio = detalleDto.precioPersonalizado ?? producto.precio;
     const subtotal = this.ordenCalculoService.calcularSubtotal(
       detalleDto.cantidad,
-      producto.precio,
+      precio,
     );
 
     return manager.create(OrdenDetalle, {
       cantidad: detalleDto.cantidad,
-      precioUnitario: producto.precio,
+      precioUnitario: precio,
       subtotal,
       producto,
     });

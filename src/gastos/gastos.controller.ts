@@ -14,6 +14,7 @@ import { GetUser } from '../auth/decorators/get-user.decorator';
 import { Usuario } from '../auth/entities/usuario.entity';
 import { PaginationDto } from '../common/dtos/pagination.dto';
 import { CreateGastoDto } from './dto/create-gasto.dto';
+import { GetGastosDto } from './dto/get-gastos.dto';
 import { UpdateGastoDto } from './dto/update-gasto.dto';
 import { GastosService } from './gastos.service';
 
@@ -28,7 +29,7 @@ export class GastosController {
   }
 
   @Get()
-  getAll(@Query() paginationDto: PaginationDto) {
+  getAll(@Query() paginationDto: GetGastosDto) {
     return this.gastosService.getAll(paginationDto);
   }
 

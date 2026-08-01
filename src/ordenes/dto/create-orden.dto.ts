@@ -5,6 +5,8 @@ import {
   IsEnum,
   IsInt,
   IsPositive,
+  IsOptional,
+  IsNumber,
   ValidateNested,
 } from 'class-validator';
 import { MetodoPago } from '../../common/enum/metodo-pago.enum';
@@ -17,6 +19,11 @@ class OrdenProductoDto {
   @IsInt()
   @IsPositive()
   cantidad!: number;
+
+  @IsOptional()
+  @IsNumber()
+  @IsPositive()
+  precioPersonalizado?: number;
 }
 
 export class CreateOrdenDto {

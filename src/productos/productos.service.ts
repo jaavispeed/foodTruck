@@ -1,4 +1,4 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException, OnModuleInit, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ILike, Repository } from 'typeorm';
 import { Usuario } from '../auth/entities/usuario.entity';
@@ -10,13 +10,27 @@ import { UpdateProductoDto } from './dto/update-producto.dto';
 import { Producto } from './entities/producto.entity';
 
 @Injectable()
-export class ProductosService {
+export class ProductosService implements OnModuleInit {
   private readonly logger = new Logger('ProductosService');
 
   constructor(
     @InjectRepository(Producto)
     private readonly productoRepository: Repository<Producto>,
   ) {}
+
+  async onModuleInit() {
+    const existing = await this.productoRepository.findOneBy({ nombre: 'Otro' });
+    if (!existing) {
+      const otro = this.productoRepository.create({
+        nombre: 'Otro',
+        descripcion: 'Producto con monto personalizado',
+        precio: 0,
+        estado: Estado.VIGENTE,
+      });
+      await this.productoRepository.save(otro);
+      this.logger.log('Producto "Otro" creado automáticamente.');
+    }
+  }
 
   async create(productoDto: CreateProductoDto, usuario: Usuario) {
     try {
@@ -90,6 +104,11 @@ export class ProductosService {
   }
 
   async softDelete(id: number) {
+    const producto = await this.getByIdProducto(id);
+    if (producto.nombre.toLowerCase() === 'otro') {
+      throw new BadRequestException('No se puede eliminar el producto "Otro"');
+    }
+
     try {
       await this.productoRepository.update(id, { estado: Estado.ELIMINADO });
       return { message: `Producto con id ${id} eliminado correctamente` };
