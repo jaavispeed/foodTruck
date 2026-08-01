@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Get, Patch, Post, Query } from '@nestjs/common';
 import { Auth } from '../auth/decorators/auth.decorator';
 import { GetUser } from '../auth/decorators/get-user.decorator';
 import { Usuario } from '../auth/entities/usuario.entity';
@@ -24,5 +24,14 @@ export class CajaController {
   @Get('abierta')
   getCajaAbierta() {
     return this.cajaService.getCajaAbierta();
+  }
+
+  @Get('reporte')
+  getReporte(
+    @Query('fechaInicio') fechaInicio?: string,
+    @Query('fechaFin') fechaFin?: string,
+    @Query('usuarioId') usuarioId?: number,
+  ) {
+    return this.cajaService.getReporteCajas(fechaInicio, fechaFin, usuarioId);
   }
 }

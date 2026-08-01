@@ -1,7 +1,16 @@
-import { IsInt, Min } from 'class-validator';
+import { IsInt, Min, IsOptional, IsString } from 'class-validator';
 
 export class CerrarCajaDto {
-  @IsInt({ message: 'El monto final debe ser un número entero (CLP)' })
+  @IsInt({ message: 'El monto final en efectivo debe ser un número entero' })
   @Min(0)
-  montoFinal!: number;
+  montoFinalEfectivo!: number;
+
+  @IsOptional()
+  @IsInt({ message: 'El monto final en tarjeta debe ser un número entero' })
+  @Min(0)
+  montoFinalTarjeta?: number;
+
+  @IsOptional()
+  @IsString()
+  observaciones?: string;
 }

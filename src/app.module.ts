@@ -3,14 +3,14 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
 import { CajaModule } from './caja/caja.module';
+import { CategoriasModule } from './categorias/categorias.module';
 import { CommonModule } from './common/common.module';
 import { DashboardModule } from './dashboard/dashboard.module';
+import { DeudasModule } from './deudas/deudas.module';
 import { GastosModule } from './gastos/gastos.module';
 import { OrdenDetalleModule } from './orden-detalle/orden-detalle.module';
 import { OrdenesModule } from './ordenes/ordenes.module';
 import { ProductosModule } from './productos/productos.module';
-import { CategoriasModule } from './categorias/categorias.module';
-import { DeudasModule } from './deudas/deudas.module';
 
 @Module({
   imports: [

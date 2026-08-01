@@ -22,7 +22,37 @@ export class Caja {
   @Column('int', {
     nullable: true,
   })
-  montoFinal!: number;
+  montoEsperadoEfectivo!: number;
+
+  @Column('int', {
+    nullable: true,
+  })
+  montoFinalEfectivo!: number;
+
+  @Column('int', {
+    nullable: true,
+  })
+  montoFinalTarjeta!: number;
+
+  @Column('int', {
+    default: 0,
+  })
+  ventasEfectivo!: number;
+
+  @Column('int', {
+    default: 0,
+  })
+  ventasDigitales!: number;
+
+  @Column('int', {
+    nullable: true,
+  })
+  diferencia!: number;
+
+  @Column('text', {
+    nullable: true,
+  })
+  observaciones!: string;
 
   @CreateDateColumn({
     type: 'timestamp',
