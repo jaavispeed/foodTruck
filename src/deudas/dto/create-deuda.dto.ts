@@ -8,4 +8,8 @@ export class CreateDeudaDto {
   @IsNumber()
   @Min(1)
   cuotasTotales!: number;
+
+  @IsNumber()
+  @Min(0)
+  porcentajeInteres!: number;
 }

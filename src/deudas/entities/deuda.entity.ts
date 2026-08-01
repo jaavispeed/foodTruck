@@ -21,6 +21,9 @@ export class Deuda {
   @Column('int')
   cuotasTotales!: number;
 
+  @Column('decimal', { precision: 5, scale: 2, default: 0 })
+  porcentajeInteres!: number;
+
   @Column('int', { default: 0 })
   cuotasPagadas!: number;
 

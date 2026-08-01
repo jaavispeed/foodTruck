@@ -40,7 +40,18 @@ export class DeudasService {
     let totalCuotasMensuales = 0;
     for (const deuda of deudasActivas) {
       if (deuda.cuotasTotales > 0) {
-        totalCuotasMensuales += (deuda.montoTotal / deuda.cuotasTotales);
+        const interes = deuda.porcentajeInteres ? Number(deuda.porcentajeInteres) : 0;
+        
+        let cuotaMensual = 0;
+        if (interes > 0 && deuda.cuotasTotales > 0) {
+          const r = interes / 100;
+          const n = deuda.cuotasTotales;
+          cuotaMensual = deuda.montoTotal * (r / (1 - Math.pow(1 + r, -n)));
+        } else if (deuda.cuotasTotales > 0) {
+          cuotaMensual = deuda.montoTotal / deuda.cuotasTotales;
+        }
+        
+        totalCuotasMensuales += cuotaMensual;
       }
     }
 
@@ -71,6 +82,7 @@ export class DeudasService {
     // Update fields
     if (updateDeudaDto.montoTotal !== undefined) deuda.montoTotal = updateDeudaDto.montoTotal;
     if (updateDeudaDto.cuotasTotales !== undefined) deuda.cuotasTotales = updateDeudaDto.cuotasTotales;
+    if (updateDeudaDto.porcentajeInteres !== undefined) deuda.porcentajeInteres = updateDeudaDto.porcentajeInteres;
 
     return this.deudaRepository.save(deuda);
   }
