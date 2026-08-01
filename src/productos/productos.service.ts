@@ -34,8 +34,10 @@ export class ProductosService implements OnModuleInit {
 
   async create(productoDto: CreateProductoDto, usuario: Usuario) {
     try {
+      const { categoriaId, ...rest } = productoDto;
       const producto = this.productoRepository.create({
-        ...productoDto,
+        ...rest,
+        categoria: (categoriaId ? { id: categoriaId } : null) as any,
         usuario,
       });
       return await this.productoRepository.save(producto);
@@ -87,9 +89,11 @@ export class ProductosService implements OnModuleInit {
   }
 
   async update(id: number, updateProductoDto: UpdateProductoDto) {
+    const { categoriaId, ...rest } = updateProductoDto;
     const product = await this.productoRepository.preload({
       id: id,
-      ...updateProductoDto,
+      ...rest,
+      ...(categoriaId !== undefined ? { categoria: (categoriaId ? { id: categoriaId } : null) as any } : {}),
     });
 
     if (!product) {

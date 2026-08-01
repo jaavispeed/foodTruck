@@ -20,4 +20,8 @@ export class CreateProductoDto {
   @IsString()
   @IsOptional()
   descripcion?: string;
+
+  @IsInt()
+  @IsOptional()
+  categoriaId?: number;
 }
